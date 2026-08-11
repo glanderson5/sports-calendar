@@ -28,7 +28,13 @@ export function CalendarView({ games }: { games: Game[] }) {
         // reads Date fields using the browser's own local timezone) always
         // displays Central time, regardless of the viewer's device timezone.
         const start = toZonedTime(new Date(g.startUtc), CENTRAL_TZ);
-        const end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
+        let end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
+        // Clamp to the end of the start day. Late games (e.g. 9pm+ starts)
+        // would otherwise end past midnight, which react-big-calendar reads
+        // as a multi-day event and renders in the all-day row instead of
+        // the timed grid.
+        const endOfStartDay = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 23, 59, 0, 0);
+        if (end > endOfStartDay) end = endOfStartDay;
         const opponentPart = g.opponent ? `${g.isHome ? " vs " : " @ "}${g.opponent}` : "";
         return {
           title: `${g.teamLabel}${opponentPart}`,

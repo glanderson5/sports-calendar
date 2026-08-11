@@ -4,5 +4,4 @@ frontend/dev-dist/
 frontend/public/games.json
 tools/
 .tools/
-.runner/
 .DS_Store

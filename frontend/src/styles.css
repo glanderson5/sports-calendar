@@ -1,0 +1,251 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b0b0f;
+  --panel: #16161d;
+  --panel-raised: #1e1e27;
+  --border: #2c2c38;
+  --text: #f2f2f5;
+  --muted: #9a9aa5;
+  --accent: #e10600;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  padding: 0.5rem 0 1rem;
+}
+
+header h1 {
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.updated-at {
+  font-size: 0.8rem;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.5rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.status {
+  color: var(--muted);
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+.calendar-wrap {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+/* ---------- react-big-calendar dark theme ---------- */
+/* The library's default CSS assumes a white page (dark text on light
+   cells). Everything below re-themes each surface explicitly instead of
+   just overriding text color, so nothing ends up dark-on-dark. */
+
+.rbc-calendar {
+  color: var(--text);
+}
+
+.rbc-off-range-bg {
+  background: var(--bg);
+}
+
+.rbc-off-range {
+  color: var(--muted);
+}
+
+.rbc-today {
+  background-color: rgba(225, 6, 0, 0.12);
+}
+
+.rbc-month-view,
+.rbc-time-view,
+.rbc-agenda-view table.rbc-agenda-table {
+  border-color: var(--border);
+}
+
+.rbc-day-bg {
+  background: var(--panel-raised);
+}
+
+.rbc-day-bg + .rbc-day-bg,
+.rbc-month-row + .rbc-month-row,
+.rbc-header + .rbc-header,
+.rbc-time-content > * + * > * {
+  border-color: var(--border);
+}
+
+.rbc-header,
+.rbc-month-header {
+  color: var(--text);
+  border-color: var(--border);
+  padding: 0.4rem 0.3rem;
+  font-weight: 600;
+}
+
+.rbc-date-cell {
+  color: var(--text);
+  padding: 0.25rem 0.4rem;
+}
+
+.rbc-date-cell.rbc-now {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.rbc-toolbar {
+  color: var(--text);
+}
+
+.rbc-toolbar button {
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.rbc-toolbar button:hover {
+  color: var(--text);
+  background: var(--panel-raised);
+  border-color: var(--border);
+}
+
+.rbc-toolbar button:active,
+.rbc-toolbar button.rbc-active {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: none;
+}
+
+.rbc-toolbar button:active:hover,
+.rbc-toolbar button.rbc-active:hover,
+.rbc-toolbar button.rbc-active:focus {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.rbc-off-range-bg,
+.rbc-selected-cell {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.rbc-event {
+  color: #fff;
+  border: none;
+}
+
+.rbc-event.rbc-selected {
+  filter: brightness(1.15);
+}
+
+.rbc-show-more {
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.rbc-show-more:hover,
+.rbc-show-more:focus {
+  color: var(--accent);
+}
+
+/* Week/day time-grid views */
+.rbc-time-header,
+.rbc-time-content,
+.rbc-time-gutter,
+.rbc-time-header-content {
+  border-color: var(--border);
+}
+
+.rbc-time-slot {
+  color: var(--muted);
+}
+
+.rbc-label {
+  color: var(--muted);
+}
+
+.rbc-current-time-indicator {
+  background-color: var(--accent);
+}
+
+/* Agenda list view */
+.rbc-agenda-view table.rbc-agenda-table {
+  background: var(--panel-raised);
+}
+
+.rbc-agenda-view table.rbc-agenda-table thead > tr > th {
+  color: var(--text);
+  border-bottom: 2px solid var(--border);
+  padding: 0.5rem 0.6rem;
+}
+
+.rbc-agenda-view table.rbc-agenda-table tbody > tr > td {
+  color: var(--text);
+  border-color: var(--border);
+  padding: 0.5rem 0.6rem;
+}
+
+.rbc-agenda-view table.rbc-agenda-table tbody > tr + tr {
+  border-top: 1px solid var(--border);
+}
+
+.rbc-agenda-date-cell,
+.rbc-agenda-time-cell {
+  color: var(--muted);
+}
+
+.rbc-agenda-empty {
+  color: var(--muted);
+}

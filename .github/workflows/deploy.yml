@@ -20,7 +20,9 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # ESPN's bot-protection blocks GitHub-hosted runner IPs (403s), so the
+    # data fetch runs on a self-hosted runner on a residential IP instead.
+    runs-on: [self-hosted, windows]
     defaults:
       run:
         working-directory: frontend

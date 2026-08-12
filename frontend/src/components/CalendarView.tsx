@@ -38,6 +38,11 @@ function centralDayKey(d: Date): string {
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 }
 
+function matchupLabel(g: Game): string {
+  const opponentPart = g.opponent ? `${g.isHome ? " vs " : " @ "}${g.opponent}` : "";
+  return `${g.teamLabel}${opponentPart}`;
+}
+
 function buildTimedEvents(games: Game[]): CalEvent[] {
   return games.map((g) => {
     // Shift into Central-time wall-clock values so the calendar (which
@@ -51,11 +56,11 @@ function buildTimedEvents(games: Game[]): CalEvent[] {
     // the timed grid.
     const endOfStartDay = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 23, 59, 0, 0);
     if (end > endOfStartDay) end = endOfStartDay;
-    const opponentPart = g.opponent ? `${g.isHome ? " vs " : " @ "}${g.opponent}` : "";
-    const label = `${g.teamLabel}${opponentPart}`;
+    const label = matchupLabel(g);
+    const resultSuffix = g.result ? ` (${g.result})` : "";
     return {
-      title: label,
-      tooltip: `${label} — ${timeFormatter.format(start)} CT`,
+      title: `${label}${resultSuffix}`,
+      tooltip: `${label} — ${timeFormatter.format(start)} CT${resultSuffix}`,
       start,
       end,
       resource: g,
@@ -78,7 +83,7 @@ function buildDaySummaryChips(games: Game[]): CalEvent[] {
     const dayStart = new Date(start.getFullYear(), start.getMonth(), start.getDate());
     return {
       title: g.teamLabel,
-      tooltip: `${g.teamLabel} plays today`,
+      tooltip: g.result ? `${g.teamLabel}: ${g.result}` : `${g.teamLabel} plays today`,
       start: dayStart,
       end: dayStart,
       allDay: true,
@@ -113,6 +118,7 @@ export function CalendarView({ games }: { games: Game[] }) {
             {selected.opponent ? `${selected.isHome ? " vs " : " @ "}${selected.opponent}` : ""} —{" "}
             {timeFormatter.format(toZonedTime(new Date(selected.startUtc), CENTRAL_TZ))} CT
             {selected.venue ? ` — ${selected.venue}` : ""}
+            {selected.result ? ` — ${selected.result}` : ""}
           </span>
           <button aria-label="Close" onClick={() => setSelected(null)}>
             ×

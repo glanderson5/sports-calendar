@@ -30,6 +30,7 @@ async function main() {
           opponent: g.opponent ?? null,
           isHome: g.isHome ?? null,
           venue: g.venue ?? null,
+          result: g.result ?? null,
           teamLabel: info.label,
           sport: info.sport,
           color: info.color,

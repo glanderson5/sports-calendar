@@ -9,6 +9,7 @@ export interface RawGame {
   isHome?: boolean;
   startUtc: string;
   venue?: string;
+  result?: string;
 }
 
 // ESPN team IDs (numeric — abbreviations are unreliable for soccer).
@@ -20,6 +21,15 @@ function nflSeasonYear(): number {
   const now = new Date();
   // The NFL season labeled e.g. "2026" runs Sep 2026 - Feb 2027.
   return now.getUTCMonth() <= 1 ? now.getUTCFullYear() - 1 : now.getUTCFullYear();
+}
+
+function resultLabel(self: any, opponent: any, comp: any): string | undefined {
+  if (!comp?.status?.type?.completed) return undefined;
+  const selfScore = self?.score?.displayValue;
+  const oppScore = opponent?.score?.displayValue;
+  if (selfScore == null || oppScore == null) return undefined;
+  const outcome = self?.winner ? "W" : opponent?.winner ? "L" : "D";
+  return `${outcome} ${selfScore}–${oppScore}`;
 }
 
 function mapEspnEvent(team: TeamKey, teamId: string, ev: any): RawGame {
@@ -35,6 +45,7 @@ function mapEspnEvent(team: TeamKey, teamId: string, ev: any): RawGame {
     isHome: self?.homeAway === "home",
     startUtc: ev.date,
     venue: comp?.venue?.fullName,
+    result: resultLabel(self, opponent, comp),
   };
 }
 

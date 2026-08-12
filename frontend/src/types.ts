@@ -11,6 +11,8 @@ export interface Game {
   teamLabel: string;
   sport: string;
   color: string;
+  /** Human-readable outcome, precomputed at fetch time. Absent/undefined for games not yet played. */
+  result: string | null;
 }
 
 export interface GamesData {

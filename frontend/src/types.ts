@@ -15,7 +15,33 @@ export interface Game {
   result: string | null;
 }
 
+export interface StandingEntry {
+  rank: number;
+  team: string;
+  wins?: number;
+  losses?: number;
+  ties?: number;
+  winPercent?: string;
+  points?: number;
+  streak?: string;
+}
+
+export interface StandingsGroup {
+  label: string;
+  entries: StandingEntry[];
+}
+
+export interface NewsArticle {
+  headline: string;
+  description: string;
+  url: string;
+  imageUrl?: string;
+  published: string;
+}
+
 export interface GamesData {
   generatedAt: string;
   games: Game[];
+  standings: Record<TeamKey, StandingsGroup[]>;
+  news: Record<TeamKey, NewsArticle[]>;
 }

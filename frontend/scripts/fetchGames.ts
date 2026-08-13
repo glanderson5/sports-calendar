@@ -3,25 +3,59 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { fetchVikingsGames, fetchLynxGames, fetchTottenhamGames, type RawGame } from "./fetchers/espn.js";
 import { fetchF1Games } from "./fetchers/f1.js";
-import { TEAMS, type TeamKey } from "../src/teams.js";
-import type { Game, GamesData } from "../src/types.js";
+import { fetchNflStandings, fetchWnbaStandings, fetchEplStandings, fetchF1Standings } from "./fetchers/standings.js";
+import { fetchVikingsNews, fetchLynxNews, fetchTottenhamNews, fetchF1News } from "./fetchers/news.js";
+import { TEAMS, TEAM_KEYS, type TeamKey } from "../src/teams.js";
+import type { Game, GamesData, StandingsGroup, NewsArticle } from "../src/types.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const FETCHERS: Record<TeamKey, () => Promise<RawGame[]>> = {
+const GAME_FETCHERS: Record<TeamKey, () => Promise<RawGame[]>> = {
   vikings: fetchVikingsGames,
   lynx: fetchLynxGames,
   tottenham: fetchTottenhamGames,
   f1: fetchF1Games,
 };
 
+const STANDINGS_FETCHERS: Record<TeamKey, () => Promise<StandingsGroup[]>> = {
+  vikings: fetchNflStandings,
+  lynx: fetchWnbaStandings,
+  tottenham: fetchEplStandings,
+  f1: fetchF1Standings,
+};
+
+const NEWS_FETCHERS: Record<TeamKey, () => Promise<NewsArticle[]>> = {
+  vikings: fetchVikingsNews,
+  lynx: fetchLynxNews,
+  tottenham: fetchTottenhamNews,
+  f1: fetchF1News,
+};
+
+async function collect<T>(
+  label: string,
+  fetchers: Record<TeamKey, () => Promise<T>>,
+  emptyValue: T
+): Promise<Record<TeamKey, T>> {
+  const entries = await Promise.all(
+    TEAM_KEYS.map(async (team) => {
+      try {
+        const value = await fetchers[team]();
+        return [team, value] as const;
+      } catch (err) {
+        console.error(`[${label}] ${team} FAILED:`, (err as Error)?.message ?? err);
+        return [team, emptyValue] as const;
+      }
+    })
+  );
+  return Object.fromEntries(entries) as Record<TeamKey, T>;
+}
+
 async function main() {
-  const teams = Object.keys(FETCHERS) as TeamKey[];
-  const results = await Promise.allSettled(teams.map((team) => FETCHERS[team]()));
+  const results = await Promise.allSettled(TEAM_KEYS.map((team) => GAME_FETCHERS[team]()));
 
   const games: Game[] = [];
   results.forEach((result, i) => {
-    const team = teams[i];
+    const team = TEAM_KEYS[i];
     if (result.status === "fulfilled") {
       const info = TEAMS[team];
       for (const g of result.value) {
@@ -44,7 +78,17 @@ async function main() {
 
   games.sort((a, b) => a.startUtc.localeCompare(b.startUtc));
 
-  const out: GamesData = { generatedAt: new Date().toISOString(), games };
+  const standings = await collect("standings", STANDINGS_FETCHERS, [] as StandingsGroup[]);
+  for (const team of TEAM_KEYS) {
+    console.log(`[standings] ${team}: ${standings[team].map((g) => `${g.label}(${g.entries.length})`).join(", ")}`);
+  }
+
+  const news = await collect("news", NEWS_FETCHERS, [] as NewsArticle[]);
+  for (const team of TEAM_KEYS) {
+    console.log(`[news] ${team}: ${news[team].length} articles`);
+  }
+
+  const out: GamesData = { generatedAt: new Date().toISOString(), games, standings, news };
   const outPath = path.join(__dirname, "..", "public", "games.json");
   fs.writeFileSync(outPath, JSON.stringify(out, null, 2));
   console.log(`Wrote ${games.length} games to ${outPath}`);

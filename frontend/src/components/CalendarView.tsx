@@ -39,8 +39,11 @@ function centralDayKey(d: Date): string {
 }
 
 function matchupLabel(g: Game): string {
-  const opponentPart = g.opponent ? `${g.isHome ? " vs " : " @ "}${g.opponent}` : "";
-  return `${g.teamLabel}${opponentPart}`;
+  // Sports without an opponent (F1) carry the distinguishing info — race
+  // vs. qualifying vs. sprint — in the title itself, so use that instead
+  // of falling back to the generic team name.
+  if (!g.opponent) return g.title || g.teamLabel;
+  return `${g.teamLabel}${g.isHome ? " vs " : " @ "}${g.opponent}`;
 }
 
 function buildTimedEvents(games: Game[]): CalEvent[] {
@@ -81,9 +84,10 @@ function buildDaySummaryChips(games: Game[]): CalEvent[] {
   return [...seen.values()].map((g) => {
     const start = toZonedTime(new Date(g.startUtc), CENTRAL_TZ);
     const dayStart = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const label = matchupLabel(g);
     return {
       title: g.teamLabel,
-      tooltip: g.result ? `${g.teamLabel}: ${g.result}` : `${g.teamLabel} plays today`,
+      tooltip: g.result ? `${label}: ${g.result}` : `${label} — today`,
       start: dayStart,
       end: dayStart,
       allDay: true,
@@ -114,8 +118,7 @@ export function CalendarView({ games }: { games: Game[] }) {
         <div className="event-detail-bar" style={{ borderColor: selected.color }}>
           <span className="swatch" style={{ backgroundColor: selected.color }} />
           <span>
-            <strong>{selected.teamLabel}</strong>
-            {selected.opponent ? `${selected.isHome ? " vs " : " @ "}${selected.opponent}` : ""} —{" "}
+            <strong>{matchupLabel(selected)}</strong> —{" "}
             {timeFormatter.format(toZonedTime(new Date(selected.startUtc), CENTRAL_TZ))} CT
             {selected.venue ? ` — ${selected.venue}` : ""}
             {selected.result ? ` — ${selected.result}` : ""}

@@ -46,15 +46,36 @@ export async function fetchF1Games(): Promise<RawGame[]> {
 
     const winners = await fetchSeasonWinners(year);
     for (const race of races) {
-      if (!race.date || !race.time) continue;
-      games.push({
-        id: `f1-${year}-${race.round}`,
-        team: "f1",
-        title: race.raceName,
-        venue: race.Circuit?.circuitName,
-        startUtc: `${race.date}T${race.time}`,
-        result: winners.get(race.round),
-      });
+      const venue = race.Circuit?.circuitName;
+
+      if (race.date && race.time) {
+        games.push({
+          id: `f1-${year}-${race.round}`,
+          team: "f1",
+          title: race.raceName,
+          venue,
+          startUtc: `${race.date}T${race.time}`,
+          result: winners.get(race.round),
+        });
+      }
+      if (race.Qualifying?.date && race.Qualifying?.time) {
+        games.push({
+          id: `f1-${year}-${race.round}-qualifying`,
+          team: "f1",
+          title: `${race.raceName} — Qualifying`,
+          venue,
+          startUtc: `${race.Qualifying.date}T${race.Qualifying.time}`,
+        });
+      }
+      if (race.Sprint?.date && race.Sprint?.time) {
+        games.push({
+          id: `f1-${year}-${race.round}-sprint`,
+          team: "f1",
+          title: `${race.raceName} — Sprint`,
+          venue,
+          startUtc: `${race.Sprint.date}T${race.Sprint.time}`,
+        });
+      }
     }
   }
 

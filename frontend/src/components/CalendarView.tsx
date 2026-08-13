@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Calendar, dateFnsLocalizer, type Event, type View } from "react-big-calendar";
+import { Calendar, dateFnsLocalizer, type Event, type View, type SlotInfo } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
 import { toZonedTime } from "date-fns-tz";
@@ -106,6 +106,7 @@ function WeekEventContent({ event }: { event: CalEvent }) {
 
 export function CalendarView({ games }: { games: Game[] }) {
   const [view, setView] = useState<View>("month");
+  const [date, setDate] = useState(new Date());
   const [selected, setSelected] = useState<Game | null>(null);
 
   const timedEvents = useMemo(() => buildTimedEvents(games), [games]);
@@ -137,9 +138,20 @@ export function CalendarView({ games }: { games: Game[] }) {
         tooltipAccessor="tooltip"
         style={{ height: "75vh" }}
         popup
-        views={["month", "week", "agenda"]}
+        views={["month", "week", "day", "agenda"]}
         view={view}
         onView={setView}
+        date={date}
+        onNavigate={setDate}
+        selectable="ignoreEvents"
+        onDrillDown={(newDate) => {
+          setDate(newDate);
+          setView("day");
+        }}
+        onSelectSlot={(slot: SlotInfo) => {
+          setDate(slot.start);
+          setView("day");
+        }}
         onSelectEvent={(event) => setSelected((event as CalEvent).resource)}
         components={{ week: { event: WeekEventContent } }}
         eventPropGetter={(event) => {

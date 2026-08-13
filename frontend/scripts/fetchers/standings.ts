@@ -67,7 +67,9 @@ export async function fetchWnbaStandings(): Promise<StandingsGroup[]> {
     return { fields, pct };
   });
   withPct.sort((a, b) => b.pct - a.pct || (b.fields.wins ?? 0) - (a.fields.wins ?? 0));
-  const entries: StandingEntry[] = withPct.map((x, i) => ({ ...x.fields, rank: i + 1 }));
+  // ESPN's "points" stat here is just (wins - losses) / 2 — an internal
+  // building block for Games Behind, not a real WNBA stat — so drop it.
+  const entries: StandingEntry[] = withPct.map((x, i) => ({ ...x.fields, points: undefined, rank: i + 1 }));
   return [{ label: "League", entries }];
 }
 

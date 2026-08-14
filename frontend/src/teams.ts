@@ -39,7 +39,10 @@ export const TEAMS: Record<TeamKey, TeamInfo> = {
     label: "Minnesota Timberwolves",
     shortLabel: "WLV",
     sport: "NBA",
-    color: "#B5471B",
+    // Darkened from the official "Moonlight Grey" (#9EA2A2), which is too
+    // light for white event text (~2.6:1 contrast) — this keeps the same
+    // grey hue at a shade that passes WCAG AA (~6.9:1).
+    color: "#575959",
   },
   f1: {
     key: "f1",

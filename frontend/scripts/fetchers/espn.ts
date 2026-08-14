@@ -62,8 +62,8 @@ function mapEspnEvent(team: TeamKey, teamId: string, ev: any): RawGame {
 export async function fetchVikingsGames(): Promise<RawGame[]> {
   const year = nflSeasonYear();
   const games: RawGame[] = [];
-  // seasontype 2 = regular season, 3 = postseason
-  for (const seasontype of [2, 3]) {
+  // seasontype 1 = preseason, 2 = regular season, 3 = postseason
+  for (const seasontype of [1, 2, 3]) {
     const data = await getJson(
       `https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams/${VIKINGS_TEAM_ID}/schedule?season=${year}&seasontype=${seasontype}`
     );
@@ -79,17 +79,22 @@ export async function fetchLynxGames(): Promise<RawGame[]> {
   const data = await getJson(
     `https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/teams/${LYNX_TEAM_ID}/schedule?season=${year}`
   );
-  return (data.events ?? [])
-    .filter((ev: any) => ev.seasonType?.type !== 1) // skip preseason
-    .map((ev: any) => mapEspnEvent("lynx", LYNX_TEAM_ID, ev));
+  return (data.events ?? []).map((ev: any) => mapEspnEvent("lynx", LYNX_TEAM_ID, ev));
 }
 
 export async function fetchTimberwolvesGames(): Promise<RawGame[]> {
   const year = nbaSeasonYear();
-  const data = await getJson(
-    `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/${TIMBERWOLVES_TEAM_ID}/schedule?season=${year}&seasontype=2`
-  );
-  return (data.events ?? []).map((ev: any) => mapEspnEvent("timberwolves", TIMBERWOLVES_TEAM_ID, ev));
+  const games: RawGame[] = [];
+  // seasontype 1 = preseason, 2 = regular season
+  for (const seasontype of [1, 2]) {
+    const data = await getJson(
+      `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/${TIMBERWOLVES_TEAM_ID}/schedule?season=${year}&seasontype=${seasontype}`
+    );
+    for (const ev of data.events ?? []) {
+      games.push(mapEspnEvent("timberwolves", TIMBERWOLVES_TEAM_ID, ev));
+    }
+  }
+  return games;
 }
 
 // ESPN's per-team schedule endpoint is unpopulated for soccer; the league

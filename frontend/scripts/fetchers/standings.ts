@@ -53,6 +53,20 @@ export async function fetchNflStandings(): Promise<StandingsGroup[]> {
   return groups;
 }
 
+// Eastern/Western, each pre-grouped by ESPN with tiebreakers already resolved via playoffSeed.
+export async function fetchNbaStandings(): Promise<StandingsGroup[]> {
+  const data = await getJson("https://site.api.espn.com/apis/v2/sports/basketball/nba/standings");
+  const groups: StandingsGroup[] = (data.children ?? []).map((c: any) => ({
+    label: c.name.includes("Western") ? "Western" : c.name.includes("Eastern") ? "Eastern" : c.name,
+    entries: c.standings.entries
+      .map((e: any) => ({ ...baseFields(e), rank: playoffSeedRank(e) }))
+      .sort((a: StandingEntry, b: StandingEntry) => a.rank - b.rank),
+  }));
+  // Timberwolves are Western — show that conference by default.
+  groups.sort((a, b) => Number(b.label === "Western") - Number(a.label === "Western"));
+  return groups;
+}
+
 // ESPN groups WNBA teams by conference for display, but the WNBA hasn't
 // used conference-based playoff seeding since 2016 — and ESPN's
 // `playoffSeed` here turns out to be conference-relative (two teams can

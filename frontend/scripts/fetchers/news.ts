@@ -32,6 +32,9 @@ export const fetchVikingsNews = () =>
 export const fetchLynxNews = () =>
   fetchNews("https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/news?team=8");
 
+export const fetchTimberwolvesNews = () =>
+  fetchNews("https://site.api.espn.com/apis/site/v2/sports/basketball/nba/news?team=16");
+
 export const fetchTottenhamNews = () =>
   fetchNews("https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/news?team=367");
 

@@ -1,10 +1,28 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { fetchVikingsGames, fetchLynxGames, fetchTottenhamGames, type RawGame } from "./fetchers/espn.js";
+import {
+  fetchVikingsGames,
+  fetchLynxGames,
+  fetchTimberwolvesGames,
+  fetchTottenhamGames,
+  type RawGame,
+} from "./fetchers/espn.js";
 import { fetchF1Games } from "./fetchers/f1.js";
-import { fetchNflStandings, fetchWnbaStandings, fetchEplStandings, fetchF1Standings } from "./fetchers/standings.js";
-import { fetchVikingsNews, fetchLynxNews, fetchTottenhamNews, fetchF1News } from "./fetchers/news.js";
+import {
+  fetchNflStandings,
+  fetchWnbaStandings,
+  fetchNbaStandings,
+  fetchEplStandings,
+  fetchF1Standings,
+} from "./fetchers/standings.js";
+import {
+  fetchVikingsNews,
+  fetchLynxNews,
+  fetchTimberwolvesNews,
+  fetchTottenhamNews,
+  fetchF1News,
+} from "./fetchers/news.js";
 import { TEAMS, TEAM_KEYS, type TeamKey } from "../src/teams.js";
 import type { Game, GamesData, StandingsGroup, NewsArticle } from "../src/types.js";
 
@@ -13,6 +31,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const GAME_FETCHERS: Record<TeamKey, () => Promise<RawGame[]>> = {
   vikings: fetchVikingsGames,
   lynx: fetchLynxGames,
+  timberwolves: fetchTimberwolvesGames,
   tottenham: fetchTottenhamGames,
   f1: fetchF1Games,
 };
@@ -20,6 +39,7 @@ const GAME_FETCHERS: Record<TeamKey, () => Promise<RawGame[]>> = {
 const STANDINGS_FETCHERS: Record<TeamKey, () => Promise<StandingsGroup[]>> = {
   vikings: fetchNflStandings,
   lynx: fetchWnbaStandings,
+  timberwolves: fetchNbaStandings,
   tottenham: fetchEplStandings,
   f1: fetchF1Standings,
 };
@@ -27,6 +47,7 @@ const STANDINGS_FETCHERS: Record<TeamKey, () => Promise<StandingsGroup[]>> = {
 const NEWS_FETCHERS: Record<TeamKey, () => Promise<NewsArticle[]>> = {
   vikings: fetchVikingsNews,
   lynx: fetchLynxNews,
+  timberwolves: fetchTimberwolvesNews,
   tottenham: fetchTottenhamNews,
   f1: fetchF1News,
 };

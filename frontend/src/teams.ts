@@ -1,4 +1,4 @@
-export type TeamKey = "tottenham" | "vikings" | "lynx" | "f1";
+export type TeamKey = "tottenham" | "vikings" | "lynx" | "timberwolves" | "f1";
 
 export interface TeamInfo {
   key: TeamKey;
@@ -10,7 +10,7 @@ export interface TeamInfo {
   color: string;
 }
 
-export const TEAM_KEYS: TeamKey[] = ["tottenham", "vikings", "lynx", "f1"];
+export const TEAM_KEYS: TeamKey[] = ["tottenham", "vikings", "lynx", "timberwolves", "f1"];
 
 export const TEAMS: Record<TeamKey, TeamInfo> = {
   tottenham: {
@@ -33,6 +33,13 @@ export const TEAMS: Record<TeamKey, TeamInfo> = {
     shortLabel: "LYN",
     sport: "WNBA",
     color: "#1B7A43",
+  },
+  timberwolves: {
+    key: "timberwolves",
+    label: "Minnesota Timberwolves",
+    shortLabel: "WLV",
+    sport: "NBA",
+    color: "#B5471B",
   },
   f1: {
     key: "f1",

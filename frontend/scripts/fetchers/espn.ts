@@ -16,11 +16,21 @@ export interface RawGame {
 const VIKINGS_TEAM_ID = "16";
 const LYNX_TEAM_ID = "8";
 const TOTTENHAM_TEAM_ID = "367";
+const TIMBERWOLVES_TEAM_ID = "16"; // NBA namespace — distinct from the NFL "16" above.
 
 function nflSeasonYear(): number {
   const now = new Date();
   // The NFL season labeled e.g. "2026" runs Sep 2026 - Feb 2027.
   return now.getUTCMonth() <= 1 ? now.getUTCFullYear() - 1 : now.getUTCFullYear();
+}
+
+function nbaSeasonYear(): number {
+  const now = new Date();
+  // Unlike the NFL, ESPN labels an NBA season by its ENDING year — the
+  // "2026-27" season (Oct 2026 - Jun 2027) is season=2027. From July
+  // onward (off-season, next season's slate is what's relevant) roll
+  // forward to that upcoming season.
+  return now.getUTCMonth() >= 6 ? now.getUTCFullYear() + 1 : now.getUTCFullYear();
 }
 
 function resultLabel(self: any, opponent: any, comp: any): string | undefined {
@@ -72,6 +82,14 @@ export async function fetchLynxGames(): Promise<RawGame[]> {
   return (data.events ?? [])
     .filter((ev: any) => ev.seasonType?.type !== 1) // skip preseason
     .map((ev: any) => mapEspnEvent("lynx", LYNX_TEAM_ID, ev));
+}
+
+export async function fetchTimberwolvesGames(): Promise<RawGame[]> {
+  const year = nbaSeasonYear();
+  const data = await getJson(
+    `https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams/${TIMBERWOLVES_TEAM_ID}/schedule?season=${year}&seasontype=2`
+  );
+  return (data.events ?? []).map((ev: any) => mapEspnEvent("timberwolves", TIMBERWOLVES_TEAM_ID, ev));
 }
 
 // ESPN's per-team schedule endpoint is unpopulated for soccer; the league

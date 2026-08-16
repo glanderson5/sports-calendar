@@ -38,6 +38,21 @@ function centralDayKey(d: Date): string {
   return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 }
 
+function googleCalendarUrl(g: Game): string {
+  const start = new Date(g.startUtc);
+  const end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
+  const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const details = [g.sport, g.result].filter((v): v is string => Boolean(v)).join(" — ");
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: matchupLabel(g),
+    dates: `${fmt(start)}/${fmt(end)}`,
+    details,
+    location: g.venue ?? "",
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 function matchupLabel(g: Game): string {
   // Sports without an opponent (F1) carry the distinguishing info — race
   // vs. qualifying vs. sprint — in the title itself, so use that instead
@@ -124,6 +139,14 @@ export function CalendarView({ games }: { games: Game[] }) {
             {selected.venue ? ` — ${selected.venue}` : ""}
             {selected.result ? ` — ${selected.result}` : ""}
           </span>
+          <a
+            className="add-to-calendar-link"
+            href={googleCalendarUrl(selected)}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            + Calendar
+          </a>
           <button aria-label="Close" onClick={() => setSelected(null)}>
             ×
           </button>

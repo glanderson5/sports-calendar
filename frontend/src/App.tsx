@@ -67,6 +67,9 @@ export default function App() {
                   </span>
                 ))}
               </div>
+              <a className="subscribe-link" href={`${import.meta.env.BASE_URL}calendars/all.ics`}>
+                📅 Subscribe to all games in your calendar app
+              </a>
               <CalendarView games={data.games} />
             </>
           )}

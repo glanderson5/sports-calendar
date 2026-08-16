@@ -2,6 +2,7 @@ node_modules/
 dist/
 frontend/dev-dist/
 frontend/public/games.json
+frontend/public/calendars/
 tools/
 .tools/
 .DS_Store

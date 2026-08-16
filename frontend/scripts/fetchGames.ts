@@ -23,6 +23,7 @@ import {
   fetchTottenhamNews,
   fetchF1News,
 } from "./fetchers/news.js";
+import { buildIcs } from "./ics.js";
 import { TEAMS, TEAM_KEYS, type TeamKey } from "../src/teams.js";
 import type { Game, GamesData, StandingsGroup, NewsArticle } from "../src/types.js";
 
@@ -117,6 +118,18 @@ async function main() {
   if (games.length === 0) {
     throw new Error("No games fetched from any source — refusing to write an empty schedule silently.");
   }
+
+  const calendarsDir = path.join(__dirname, "..", "public", "calendars");
+  fs.mkdirSync(calendarsDir, { recursive: true });
+  fs.writeFileSync(path.join(calendarsDir, "all.ics"), buildIcs(games, "Sports Calendar — All Teams"));
+  for (const team of TEAM_KEYS) {
+    const teamGames = games.filter((g) => g.team === team);
+    fs.writeFileSync(
+      path.join(calendarsDir, `${team}.ics`),
+      buildIcs(teamGames, `Sports Calendar — ${TEAMS[team].label}`)
+    );
+  }
+  console.log(`Wrote ${TEAM_KEYS.length + 1} .ics feeds to ${calendarsDir}`);
 }
 
 main().catch((err) => {

@@ -132,6 +132,9 @@ export function TeamPage({ team, data }: { team: TeamKey; data: GamesData }) {
   return (
     <div className="team-page">
       <h1 style={{ color: info.color }}>{info.label}</h1>
+      <a className="subscribe-link" href={`${import.meta.env.BASE_URL}calendars/${team}.ics`}>
+        📅 Subscribe to {info.label} in your calendar app
+      </a>
       <StandingsSection team={team} data={data} />
       <RecentResults team={team} games={teamGames} />
       <section>

@@ -87,6 +87,7 @@ async function main() {
           isHome: g.isHome ?? null,
           venue: g.venue ?? null,
           result: g.result ?? null,
+          competition: g.competition ?? null,
           teamLabel: info.label,
           sport: info.sport,
           color: info.color,

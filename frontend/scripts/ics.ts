@@ -28,8 +28,11 @@ function toIcsUtc(iso: string): string {
 function buildEventLines(g: Game): string[] {
   const start = new Date(g.startUtc);
   const end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
-  const summary = g.opponent ? `${g.teamLabel}${g.isHome ? " vs " : " @ "}${g.opponent}` : g.title;
-  const description = [g.sport, g.result].filter((v): v is string => Boolean(v)).join(" — ");
+  const competitionSuffix = g.opponent && g.competition ? ` (${g.competition})` : "";
+  const summary = g.opponent
+    ? `${g.teamLabel}${g.isHome ? " vs " : " @ "}${g.opponent}${competitionSuffix}`
+    : g.title;
+  const description = [g.sport, g.competition, g.result].filter((v): v is string => Boolean(v)).join(" — ");
 
   const raw = [
     "BEGIN:VEVENT",

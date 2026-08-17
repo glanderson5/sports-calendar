@@ -10,6 +10,8 @@ export interface RawGame {
   startUtc: string;
   venue?: string;
   result?: string;
+  /** Set only when it's not the team's primary league (e.g. "FA Cup"), so cup fixtures read distinctly from league ones. */
+  competition?: string;
 }
 
 // ESPN team IDs (numeric — abbreviations are unreliable for soccer).
@@ -42,7 +44,7 @@ function resultLabel(self: any, opponent: any, comp: any): string | undefined {
   return `${outcome} ${selfScore}–${oppScore}`;
 }
 
-function mapEspnEvent(team: TeamKey, teamId: string, ev: any): RawGame {
+function mapEspnEvent(team: TeamKey, teamId: string, ev: any, competition?: string): RawGame {
   const comp = ev.competitions?.[0];
   const competitors: any[] = comp?.competitors ?? [];
   const self = competitors.find((c) => c.team?.id === teamId);
@@ -56,6 +58,7 @@ function mapEspnEvent(team: TeamKey, teamId: string, ev: any): RawGame {
     startUtc: ev.date,
     venue: comp?.venue?.fullName,
     result: resultLabel(self, opponent, comp),
+    competition,
   };
 }
 
@@ -100,19 +103,31 @@ export async function fetchTimberwolvesGames(): Promise<RawGame[]> {
 // ESPN's per-team schedule endpoint is unpopulated for soccer; the league
 // scoreboard over a wide date range works and can be filtered by team.
 // (Endpoint rejects date ranges over 365 days.)
-export async function fetchTottenhamGames(): Promise<RawGame[]> {
+async function fetchSoccerCompetitionGames(leagueSlug: string, competition?: string): Promise<RawGame[]> {
   const now = new Date();
   const start = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   const end = new Date(start.getTime() + 364 * 24 * 60 * 60 * 1000);
   const fmt = (d: Date) => d.toISOString().slice(0, 10).replace(/-/g, "");
   const data = await getJson(
-    `https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/scoreboard?dates=${fmt(start)}-${fmt(end)}&limit=1000`
+    `https://site.api.espn.com/apis/site/v2/sports/soccer/${leagueSlug}/scoreboard?dates=${fmt(start)}-${fmt(end)}&limit=1000`
   );
   const games: RawGame[] = [];
   for (const ev of data.events ?? []) {
     const competitors: any[] = ev.competitions?.[0]?.competitors ?? [];
     if (!competitors.some((c) => c.team?.id === TOTTENHAM_TEAM_ID)) continue;
-    games.push(mapEspnEvent("tottenham", TOTTENHAM_TEAM_ID, ev));
+    games.push(mapEspnEvent("tottenham", TOTTENHAM_TEAM_ID, ev, competition));
   }
   return games;
+}
+
+// Cup fixtures aren't predetermined for the whole season — a round's match
+// only appears once the previous round finishes and the draw is made, so
+// this naturally fills in over the season rather than all at once.
+export async function fetchTottenhamGames(): Promise<RawGame[]> {
+  const [league, faCup, carabaoCup] = await Promise.all([
+    fetchSoccerCompetitionGames("eng.1"), // Premier League — no competition label, matches existing behavior
+    fetchSoccerCompetitionGames("eng.fa", "FA Cup"),
+    fetchSoccerCompetitionGames("eng.league_cup", "Carabao Cup"),
+  ]);
+  return [...league, ...faCup, ...carabaoCup];
 }

@@ -93,7 +93,8 @@ function RecentResults({ team, games }: { team: TeamKey; games: Game[] }) {
           <li key={g.id}>
             <span className="result-date">{dateFormatter.format(new Date(g.startUtc))}</span>
             <span>
-              {g.opponent ? `${g.isHome ? "vs" : "@"} ${g.opponent}` : g.title} — <strong>{g.result}</strong>
+              {g.opponent ? `${g.isHome ? "vs" : "@"} ${g.opponent}` : g.title}
+              {g.competition ? ` (${g.competition})` : ""} — <strong>{g.result}</strong>
             </span>
           </li>
         ))}

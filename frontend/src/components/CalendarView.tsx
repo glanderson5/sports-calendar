@@ -42,7 +42,7 @@ function googleCalendarUrl(g: Game): string {
   const start = new Date(g.startUtc);
   const end = new Date(start.getTime() + 3 * 60 * 60 * 1000);
   const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-  const details = [g.sport, g.result].filter((v): v is string => Boolean(v)).join(" — ");
+  const details = [g.sport, g.competition, g.result].filter((v): v is string => Boolean(v)).join(" — ");
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: matchupLabel(g),
@@ -58,7 +58,8 @@ function matchupLabel(g: Game): string {
   // vs. qualifying vs. sprint — in the title itself, so use that instead
   // of falling back to the generic team name.
   if (!g.opponent) return g.title || g.teamLabel;
-  return `${g.teamLabel}${g.isHome ? " vs " : " @ "}${g.opponent}`;
+  const competitionSuffix = g.competition ? ` (${g.competition})` : "";
+  return `${g.teamLabel}${g.isHome ? " vs " : " @ "}${g.opponent}${competitionSuffix}`;
 }
 
 function buildTimedEvents(games: Game[]): CalEvent[] {

@@ -13,6 +13,8 @@ export interface Game {
   color: string;
   /** Human-readable outcome, precomputed at fetch time. Absent/undefined for games not yet played. */
   result: string | null;
+  /** Set only when it's not the team's primary league (e.g. "FA Cup"), so cup fixtures read distinctly from league ones. */
+  competition: string | null;
 }
 
 export interface StandingEntry {
